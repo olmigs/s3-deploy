@@ -2,29 +2,35 @@
 use aws_sdk_s3::{ByteStream, Client, Error};
 use clap::{Parser, Subcommand};
 use mime::Mime;
-use std::{collections::HashMap, fs, path::Path};
+use std::{collections::HashMap, fs, path::{Path, PathBuf}};
 
-fn get_out_files(path: &str) -> Vec<String> {
-    let filename = path.to_owned() + "/out/public.json";
-    let contents = fs::read_to_string(filename).expect("Something went wrong reading the file");
+fn get_public_files(path: &str) -> Vec<String> {
+    // get pathbuf
+    let mut public_path = PathBuf::from(path);
+    public_path.push("out");
+    public_path.push("public.json");
+    let contents = fs::read_to_string(public_path).expect("Could not find public.json");
     let json: Vec<String> = serde_json::from_str(&contents).expect("It's not an array somehow");
     json
 }
 
 fn get_modified_files(path: &String) -> HashMap<String, String> {
-    let in_filenames = get_out_files(path);
+    let in_filenames = get_public_files(path);
     let mut out_filenames = HashMap::new();
     for name in in_filenames {
-        let filepath = path.clone() + "/public/" + &name;
-        let metadata = fs::metadata(&filepath).expect("Error getting metadata");
+        let mut file_path = PathBuf::from(path);
+        file_path.push("public");
+        file_path.push(&name);
+        let metadata = fs::metadata(file_path).expect("Error getting metadata");
         let last_modified = metadata
             .modified()
             .expect("Error getting system time")
             .elapsed()
             .expect("Error getting elapsed")
             .as_secs();
+        let file_string = path.clone() + "/public/" + &name; // migsnote: use file_path.to_str?
         if last_modified < 24 * 3600 && metadata.is_file() {
-            out_filenames.insert(name, filepath);
+            out_filenames.insert(name, file_string);
         }
     }
     out_filenames
@@ -55,13 +61,13 @@ mod tests {
 
     #[test]
     fn test_out_files_len() {
-        let files = get_out_files("/Some/absolute/path");
+        let files = get_public_files("/Users/migs/dev/js/klyric");
         assert_eq!(files.len(), 7);
     }
 
     #[test]
     fn test_mime_types() {
-        let files = get_out_files("/Some/absolute/path");
+        let files = get_public_files("/Users/migs/dev/js/klyric");
         for file in files {
             let res = get_mime_type(&file);
             assert_eq!(res.is_ok(), true);
@@ -97,7 +103,7 @@ async fn upload_object(
                 .send()
                 .await?;
             match resp.e_tag {
-                Some(tag) => println!("Upload success for {} \n  Entity tag {}", key, tag),
+                Some(tag) => println!("Upload success for {} \n   Entity tag {}", key, tag),
                 None => println!("Upload success for {}", key),
             }
         }

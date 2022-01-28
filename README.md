@@ -23,7 +23,7 @@ SUBCOMMANDS:
 ∫
 ```
 
-For a more philosophical dissection of the tool, [see this blog post](http://mdguerrero.com/blog).
+For a more philosophical dissection of a deployment workflow with this tool, [see this blog post](http://mdguerrero.com/blog).
 
 ### Requirements
 
@@ -37,23 +37,22 @@ Any static assets you wish to deploy from a root directory e.g. `project` must
 ### Usage
 
 ```shell
-∫ s3-deploy modified -p /Static/site/project
+∫ s3-deploy modified -p /Local/static/assets
 
 2 files modified recently:
    build/bundle.js
    index.html
-∫ s3-deploy yolo -b example.com -p /Static/site/project -s app
+∫ s3-deploy yolo -b example.com -p /Local/static/assets -s app
 
 Upload success for app/build/bundle.js
-  Entity tag "<REDACTED>"
+   Entity tag "<REDACTED>"
 Upload success for app/index.html
-  Entity tag "<REDACTED>"
+   Entity tag "<REDACTED>"
 ∫
 ```
 
 ### Notices
 
--   Probably does not work on Windows
 -   `Commands::Upload` is under-implemented
 -   `Commands::Delete` is unimplemented
 
