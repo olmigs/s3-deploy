@@ -32,7 +32,7 @@ Any static assets you wish to deploy from a root directory e.g. `project` must
 1. live in `project/public`, and
 2. be specified in an array in `project/out/public.json`.
 
-`s3-deploy` assumes you have AWS access keys are available in your environment. See [Getting started](https://docs.aws.amazon.com/sdk-for-rust/latest/dg/getting-started.html#getting-started-step2).
+`s3-deploy` assumes you have AWS access keys available in your environment. See [Getting started](https://docs.aws.amazon.com/sdk-for-rust/latest/dg/getting-started.html#getting-started-step2).
 
 ### Usage
 

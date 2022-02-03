@@ -61,13 +61,13 @@ mod tests {
 
     #[test]
     fn test_out_files_len() {
-        let files = get_public_files("/Users/migs/dev/js/klyric");
+        let files = get_public_files("/Static/site/assets");
         assert_eq!(files.len(), 7);
     }
 
     #[test]
     fn test_mime_types() {
-        let files = get_public_files("/Users/migs/dev/js/klyric");
+        let files = get_public_files("/Static/site/assets");
         for file in files {
             let res = get_mime_type(&file);
             assert_eq!(res.is_ok(), true);
