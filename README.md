@@ -4,7 +4,7 @@
 
 ```shell
 ∫ s3-deploy help
-s3-deploy 1.0
+s3-deploy 1.1
 olmigs <migs@mdguerrero.com>
 Deploy your static site to AWS S3
 
@@ -19,6 +19,7 @@ SUBCOMMANDS:
     help        Print this message or the help of the given subcommand(s)
     modified    Print recently modified files (< 24 hrs) in <PROJECT>
     print       Print objects in <BUCKET>
+    upload      Deploy <FILE> to <BUCKET>
     yolo        Deploy recently modified files in <PROJECT> to <BUCKET>
 ∫
 ```
@@ -53,7 +54,6 @@ Upload success for app/index.html
 
 ### Notices
 
--   `Commands::Upload` is under-implemented
 -   `Commands::Delete` is unimplemented
 
 **Feel free to raise an issue for any of these, or other, concerns.**

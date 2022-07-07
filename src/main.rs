@@ -55,26 +55,6 @@ fn get_mime_type(filename: &str) -> Result<Mime, &'static str> {
     Ok(res)
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_out_files_len() {
-        let files = get_public_files("/Static/site/assets");
-        assert_eq!(files.len(), 7);
-    }
-
-    #[test]
-    fn test_mime_types() {
-        let files = get_public_files("/Static/site/assets");
-        for file in files {
-            let res = get_mime_type(&file);
-            assert_eq!(res.is_ok(), true);
-        }
-    }
-}
-
 async fn show_objects(client: &Client, bucket: &str) -> Result<(), Error> {
     let resp = client.list_objects_v2().bucket(bucket).send().await?;
     println!("{}", bucket);
@@ -140,8 +120,6 @@ async fn deploy(
         let mime = get_mime_type(&filename).expect("Could not get media type");
         let mut full_key = key_folder.clone();
         full_key.push_str(&key);
-        // println!("{}", &full_key);
-        // uncomment below to actually upload!
         upload_object(client, bucket, mime, &filename, &full_key).await?;
     }
     Ok(())
@@ -154,10 +132,21 @@ async fn deploy_single(
     client: &Client,
 ) -> Result<(), Error> {
     // get key from file name
+    let key_folder = match prepend {
+        Some(pre) => {
+            let mut name = pre.clone();
+            name.push_str("/");
+            name
+        }
+        None => String::from(""),
+    };
     // get MIME type
+    let mime = get_mime_type(file).expect("Could not get media type");
     // get prepend
+    let mut full_key = key_folder.clone();
+    full_key.push_str(file);
     // upload asset
-    println!("todo!");
+    upload_object(client, bucket, mime, &file, &full_key).await?;
     Ok(())
 }
 
@@ -172,7 +161,7 @@ fn modified(project: &String) -> () {
 #[derive(Parser)]
 #[clap(name = "s3-deploy")]
 #[clap(author = "olmigs <migs@mdguerrero.com>")]
-#[clap(version = "1.0")]
+#[clap(version = "1.1")]
 #[clap(about = "Deploy your static site to AWS S3", long_about = None)]
 struct Cli {
     #[clap(subcommand)]
@@ -233,4 +222,24 @@ async fn main() -> Result<(), Error> {
         } => deploy_single(bucket, file, subdirectory, &client).await?,
     }
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_out_files_len() {
+        let files = get_public_files("/Static/site/assets");
+        assert_eq!(files.len(), 7);
+    }
+
+    #[test]
+    fn test_mime_types() {
+        let files = get_public_files("/Static/site/assets");
+        for file in files {
+            let res = get_mime_type(&file);
+            assert_eq!(res.is_ok(), true);
+        }
+    }
 }
